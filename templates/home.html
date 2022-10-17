@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+
+{% block main %}
+    <div class="container">
+        <canvas id="myCanvas" style="border:1px solid #777;">Your browser does not support the canvas tag.</canvas>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+    <script>
+        $(document).ready(function() {
+            var myCanvas = document.getElementById('myCanvas')
+            var myChart = myCanvas.getContext('2d');
+            console.log('context', myChart);
+            var massPopChart= new Chart(myChart, {
+                type: 'bar', // bar, horizontal bar, pie, line, doughbut, radar, polarArea
+                data: {
+                    labels: ['Boston', 'Worcester', 'Springfield', 'Lowell', 'Cambridge', 'New Bedford'],
+                    datasets:[{
+                        label: "Population",
+                        data:[
+                            617594,
+                            181045,
+                            153060,
+                            106519,
+                            105162,
+                            95072
+                        ],
+                        fill: false,
+                        backgroundColor:"green",
+                        borderWidth: 4,
+                    }],
+                },
+                options: {}
+            });
+        });
+
+    </script>
+{% endblock %}

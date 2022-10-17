@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Run script once DOM is loaded
+        document.addEventListener("DOMContentLoaded", function() {
+            // TO DO
+            let table = document.querySelector(".table");
+            let cells = document.querySelectorAll("td");
+            let rows = document.querySelectorAll("tr");
+            var row_id = 0;
+
+            for (let r = 0; r < rows.length; r++) {
+                let row = rows[r];
+                row.onclick = function() {
+                    row_id = this.rowIndex;
+                }
+            }
+
+            for (let i = 0; i < cells.length; i++) {
+                let cell = cells[i];
+                if (cell.cellIndex == 0) {
+                    continue;
+                }
+                cell.onclick = function() {
+                    if (this.hasAttribute("data-clicked")) {
+                        return;
+                    }
+                    this.setAttribute("data-clicked", "yes");
+                    this.setAttribute("data-text", this.innerHTML);
+                    var input = document.createElement("input");
+                    input.setAttribute("type", "text");
+                    input.value = this.innerHTML;
+                    input.style.width = this.offsetWidth + "px";
+                    input.style.backgroundColor = "LightGoldenRodYellow";
+
+                    input.onblur = function() {
+                        var td = input.parentElement;
+                        var original_content = input.parentElement.getAttribute("data-text");
+                        var new_content = this.value;
+                        var col_id = input.parentElement.id;
+
+
+                        if (original_content != new_content)
+                        {
+                            // TO DO: SAVE THE NEW DATA TO DATABASE
+                            // Create an XMLHttpRequest object by JavaScript
+                            const request = new XMLHttpRequest();
+                            const content_request = [row_id, col_id, original_content, new_content];
+                            console.log(content_request);
+                            request.open("POST", `/ProcessNewContent/${JSON.stringify(content_request)}`);
+                            request.send();
+
+                            td.removeAttribute("data-clicked");
+                            td.removeAttribute("data-text");
+                            td.innerHTML = new_content;
+                            console.log(original_content + " has been changed to " + new_content);
+                        } else {
+                            td.removeAttribute("data-clicked");
+                            td.removeAttribute("data-text");
+                            td.innerHTML = original_content;
+                            console.log("No changes made");
+                        }
+                    }
+
+                    input.onkeypress = function() {
+                        if (event.keyCode == 13) {
+                            this.blur()
+                        }
+                    }
+
+                    this.innerHTML = "";
+                    this.append(input);
+                    this.firstElementChild.select();
+                }
+            }
+        })
+    </script>
+{% endblock %}
+
+
+{% block main %}
+    <table id="table" class="table" >
+        <tr>
+            <th width="3%" style="background-color: #87C0CD">S/N</th>
+            <th width="20%" style="background-color: #87C0CD">Job Title</th>
+            <th width="10%" style="background-color: #87C0CD">Company</th>
+            <th width="5%" style="background-color: #87C0CD">Job ID</th>
+            <th width="10%" style="background-color: #87C0CD">Date</th>
+            <th width="10%" style="background-color: #87C0CD">Status</th>
+            <th width="15%" style="background-color: #87C0CD">Remarks</th>
+            <th width="20%" style="background-color: #87C0CD">URL</th>
+        </tr>
+
+        {% for entry in history %}
+        <tr>
+            <td width="3%"></td>
+            <td width="20%" contenteditable="true" id="job_title">{{ entry["job_title"] }}</td>
+            <td width="10%" contenteditable="true" id="company">{{ entry["company"] }}</td>
+            <td width="5%" contenteditable="true" id="job_id">{{ entry["job_id"] }}</td>
+            <td width="10%" contenteditable="true" id="application_date">{{ entry["application_date"] }}</td>
+            <td width="10%" contenteditable="true" id="application_status">{{ entry["application_status"] }}</td>
+            <td width="15%" contenteditable="true" id="remarks">{{ entry["remarks"] }}</td>
+            <td width="20%" contenteditable="true" id="url">{{ entry["url"] }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+{% endblock %}
